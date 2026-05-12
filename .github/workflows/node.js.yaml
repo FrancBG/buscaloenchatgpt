@@ -45,7 +45,7 @@ jobs:
     needs:
       - test
 
-    if: failure() && (github.event_name == 'pull_request' || github.event_name == 'push') && github.actor != 'github-actions[bot]' && github.actor != 'nektos/act'
+    if: failure() && (github.event_name == 'pull_request' || github.event_name == 'push') && github.actor != 'github-actions[bot]' && github.actor != 'nektos/act' && github.actor != 'dependabot[bot]'
 
     steps:
       - uses: actions/checkout@v6
