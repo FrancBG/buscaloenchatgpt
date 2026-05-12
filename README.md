@@ -15,6 +15,10 @@ pnpm dev
 
 - `PUBLIC_CHATGPT_ORIGIN` — Origen de la **redirección final** al chat (por defecto `https://chatgpt.com`). Detalle en `.env.example`.
 
+## CI (GitHub Actions)
+
+- **Docker Hub** (workflow `docker.yaml`): en el repo → **Settings → Secrets and variables → Actions**, pestañas **Variables** y **Secrets** del **repositorio**: `DOCKER_USERNAME` y `DOCKER_PASSWORD` (no hace falta un GitHub Environment salvo que el job declare `environment:`).
+
 ## Licencia
 
 AGPL-3.0-or-later (heredada del proyecto base).
