@@ -23,7 +23,7 @@ const config = {
 
 	kit: {
 		adapter: adapter(),
-		paths: { base: env.BUILD_BASE },
+		paths: { base: env.BUILD_BASE ?? '' },
 	},
 }
 

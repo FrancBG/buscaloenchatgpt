@@ -4,11 +4,21 @@ on:
   push:
     branches: main
 
+# Solo un despliegue Pages a la vez
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     if: ${{ github.actor != 'nektos/act' }}
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
 
     steps:
       - uses: actions/checkout@v6
@@ -19,10 +29,23 @@ jobs:
         with:
           cache: pnpm
           node-version: 21
+
+      # Dominio propio (buscaloenchatgpt.com): variable repo PAGES_USE_ROOT_BASE=true → BUILD_BASE vacío.
+      # Sin variable (o distinto de "true"): BUILD_BASE=/buscaloenchatgpt → https://francbg.github.io/buscaloenchatgpt/
+      - name: Configure SvelteKit base for Pages
+        run: |
+          ROOT="${{ vars.PAGES_USE_ROOT_BASE }}"
+          if [ "$ROOT" = "true" ]; then
+            echo "BUILD_BASE=" >> "$GITHUB_ENV"
+            echo "Using empty base (custom domain at site root)"
+          else
+            echo "BUILD_BASE=/buscaloenchatgpt" >> "$GITHUB_ENV"
+            echo "Using project Pages base /buscaloenchatgpt"
+          fi
+
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
-        env:
-          BUILD_BASE: /buscaloenchatgpt
+
       - uses: actions/upload-pages-artifact@v4
         with:
           path: build
