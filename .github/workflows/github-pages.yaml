@@ -24,11 +24,11 @@ jobs:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
         with:
-          version: latest
-      - uses: actions/setup-node@v6
+          version: 10
+      - uses: actions/setup-node@v4
         with:
           cache: pnpm
-          node-version: 21
+          node-version: 24
 
       # Dominio propio (buscaloenchatgpt.com): variable repo PAGES_USE_ROOT_BASE=true → BUILD_BASE vacío.
       # Sin variable (o distinto de "true"): BUILD_BASE=/buscaloenchatgpt → https://francbg.github.io/buscaloenchatgpt/

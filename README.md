@@ -6,6 +6,8 @@ Parodia inspirada en **LMGTFY**: escribes una pregunta, compartes el enlace, se 
 
 ## Desarrollo
 
+Requisitos: **pnpm 10+** y **Node 22+** (`engines` en `package.json`, `engine-strict=true` en [`.npmrc`](.npmrc)). En GitHub Actions se usa **Node 24** y pnpm 10 ([`node.js.yaml`](.github/workflows/node.js.yaml), [`github-pages.yaml`](.github/workflows/github-pages.yaml)); para igualar CI al 100 %, usa Node 24 en local.
+
 ```bash
 pnpm install
 pnpm dev
@@ -17,7 +19,7 @@ pnpm dev
 
 ## GitHub Pages (producción)
 
-El workflow [`.github/workflows/github-pages.yaml`](.github/workflows/github-pages.yaml) construye con **adapter-static** y sube la carpeta `build`.
+El workflow [`.github/workflows/github-pages.yaml`](.github/workflows/github-pages.yaml) construye con **adapter-static** y sube la carpeta `build`. Ahí mismo, en un paso previo al build, se define **`BUILD_BASE` en el entorno del job** (`GITHUB_ENV`) según la variable de repo `PAGES_USE_ROOT_BASE` — no intervienen secretos ni Docker.
 
 ### Dominio propio `buscaloenchatgpt.com`
 
@@ -39,7 +41,10 @@ El workflow [`.github/workflows/github-pages.yaml`](.github/workflows/github-pag
 
 ## CI (GitHub Actions)
 
-- **Docker Hub** (workflow `docker.yaml`): en el repo → **Settings → Secrets and variables → Actions**, pestañas **Variables** y **Secrets** del **repositorio**: `DOCKER_USERNAME` y `DOCKER_PASSWORD` (no hace falta un GitHub Environment salvo que el job declare `environment:`).
+- **[`node.js.yaml`](.github/workflows/node.js.yaml)** — en cada PR y push a `main`: `pnpm install`, build, comprobaciones Svelte, tests unitarios y lint (job opcional de auto-fix si falla el primero).
+- **[`github-pages.yaml`](.github/workflows/github-pages.yaml)** — en push a `main`: build estático y despliegue a GitHub Pages (Node 24, pnpm 10).
+
+La imagen Docker y el workflow de publicación a registries **no** están activos en CI; para construir localmente sigue existiendo el `Dockerfile` y los scripts `docker:*` en `package.json` si los necesitas.
 
 ## Licencia
 
