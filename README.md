@@ -2,11 +2,13 @@
 
 Sitio: [buscaloenchatgpt.com](https://buscaloenchatgpt.com) · Código: [github.com/FrancBG/buscaloenchatgpt](https://github.com/FrancBG/buscaloenchatgpt)
 
-Parodia inspirada en **LMGTFY**: escribes una pregunta, compartes el enlace, se reproduce una animación y al final se intenta **copiar el texto al portapapeles**, se muestra un mensaje y se abre **ChatGPT** en su URL principal (`CHAT_SUBMIT_ORIGIN`, por defecto `https://chatgpt.com`) para que pegues la pregunta. Sin backend propio; proyecto **SvelteKit** + Tailwind.
+Parodia inspirada en **LMGTFY**: escribes una pregunta, compartes el enlace, se reproduce una animación y al final se intenta **copiar el texto al portapapeles**, se muestra un mensaje y se abre **ChatGPT** para pegar la pregunta. El destino del formulario GET en `/ask` es el origen del chat (variable pública **`PUBLIC_CHATGPT_ORIGIN`**, por defecto `https://chatgpt.com`). Sin backend propio; proyecto **SvelteKit** + Tailwind.
 
 ## Desarrollo
 
-Requisitos: **pnpm 10+** y **Node 22+** (`engines` en `package.json`, `engine-strict=true` en [`.npmrc`](.npmrc)). En GitHub Actions se usa **Node 24** y pnpm 10 ([`node.js.yaml`](.github/workflows/node.js.yaml), [`github-pages.yaml`](.github/workflows/github-pages.yaml)); para igualar CI al 100 %, usa Node 24 en local.
+- **Node:** mínimo según `engines` en [`package.json`](package.json) (**22+**). En **GitHub Actions** los workflows usan **Node 24**; para reproducir CI al pie de la letra, usa Node 24 en local.
+- **pnpm:** mínimo **10** (`engines.pnpm`). La versión concreta que instala CI está fijada en **`packageManager`** del mismo `package.json` (Corepack / `pnpm/action-setup` leen ese campo; no dupliques otra versión en el YAML).
+- **`engine-strict=true`** en [`.npmrc`](.npmrc): si `pnpm install` falla por versión, actualiza Node o pnpm.
 
 ```bash
 pnpm install
@@ -15,7 +17,8 @@ pnpm dev
 
 ## Variables opcionales
 
-- `PUBLIC_CHATGPT_ORIGIN` — Origen de la **redirección final** al chat (por defecto `https://chatgpt.com`). Detalle en `.env.example`.
+- **`PUBLIC_CHATGPT_ORIGIN`** — Origen del **formulario/redirección** final al chat (solo origin con protocolo). Por defecto `https://chatgpt.com`. Detalle en [`.env.example`](.env.example).
+- **Build estático local (como en Pages):** en `.env` o `.env.local` puedes definir **`BUILD_BASE`** (vacío o `/buscaloenchatgpt`) y, si hace falta, **`BUILD_ADAPTER=static`**; lo consume [`svelte.config.js`](svelte.config.js) (prefijo `BUILD_` vía Vite `loadEnv`).
 
 ## GitHub Pages (producción)
 
@@ -41,10 +44,10 @@ El workflow [`.github/workflows/github-pages.yaml`](.github/workflows/github-pag
 
 ## CI (GitHub Actions)
 
-- **[`node.js.yaml`](.github/workflows/node.js.yaml)** — en cada PR y push a `main`: `pnpm install`, build, comprobaciones Svelte, tests unitarios y lint (job opcional de auto-fix si falla el primero).
-- **[`github-pages.yaml`](.github/workflows/github-pages.yaml)** — en push a `main`: build estático y despliegue a GitHub Pages (Node 24, pnpm 10).
+- **[`node.js.yaml`](.github/workflows/node.js.yaml)** — en PR, push y **merge queue** hacia `main`: `pnpm install --frozen-lockfile --strict-peer-dependencies`, build, `svelte-check`, tests unitarios y lint. Si el job `test` falla, el job `fix` (solo en PR/push, no bots) puede reparar lockfile, formato y lint y hacer push.
+- **[`github-pages.yaml`](.github/workflows/github-pages.yaml)** — en push a `main`: `pnpm install --frozen-lockfile`, build estático y despliegue a GitHub Pages (**Node 24**; pnpm desde `packageManager` en `package.json`). Incluye `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true` para las acciones JS que aún avisaban por Node 20.
 
-La imagen Docker y el workflow de publicación a registries **no** están activos en CI; para construir localmente sigue existiendo el `Dockerfile` y los scripts `docker:*` en `package.json` si los necesitas.
+La imagen Docker y la publicación a registries **no** están en CI; para uso local siguen el [`Dockerfile`](Dockerfile) y los scripts `docker:*` en `package.json`.
 
 ## Licencia
 
