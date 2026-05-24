@@ -14,9 +14,16 @@
 	export let submitLabel = 'Buscarlo'
 	/** Si es true, el submit no navega (útil en `/ask` para animación sin envío GET real). */
 	export let preventSubmit = false
+	/** Llamado tras preventDefault cuando `preventSubmit` es true; recibe el valor de `q`. */
+	export let onQuerySubmit: ((query: string) => void) | undefined = undefined
 
 	function onSubmit(e: SubmitEvent) {
-		if (preventSubmit) e.preventDefault()
+		if (preventSubmit) {
+			e.preventDefault()
+			const form = e.currentTarget as HTMLFormElement
+			const q = (new FormData(form).get('q') ?? '').toString()
+			onQuerySubmit?.(q)
+		}
 	}
 </script>
 

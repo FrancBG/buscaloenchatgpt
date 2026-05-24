@@ -16,6 +16,9 @@
 	const CLIPBOARD_FAIL =
 		'No pudimos copiar al portapapeles (permisos del navegador). Copia tú el texto del campo de arriba; te llevamos a ChatGPT igualmente.'
 
+	const PHASE_PAUSE_MS = 1000
+	const STEP2_PAUSE_MS = 3500
+
 	onMount(async () => {
 		await new Promise(resolve => requestIdleCallback(resolve))
 
@@ -25,15 +28,15 @@
 		await move(cursor, input)
 		input.focus()
 		await write(q)
-		await new Promise(resolve => setTimeout(resolve, 1000))
+		await new Promise(resolve => setTimeout(resolve, PHASE_PAUSE_MS))
 
 		step++
 		await move(cursor, button)
 		button.focus()
-		await new Promise(resolve => setTimeout(resolve, 1000))
+		await new Promise(resolve => setTimeout(resolve, STEP2_PAUSE_MS))
 
 		step++
-		await new Promise(resolve => setTimeout(resolve, 400))
+		await new Promise(resolve => setTimeout(resolve, PHASE_PAUSE_MS))
 
 		const copied = await copyTextToClipboard(q)
 		clipboardMessage = copied ? CLIPBOARD_OK : CLIPBOARD_FAIL

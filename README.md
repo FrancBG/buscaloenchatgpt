@@ -2,7 +2,7 @@
 
 Sitio: [buscaloenchatgpt.com](https://buscaloenchatgpt.com) · Código: [github.com/FrancBG/buscaloenchatgpt](https://github.com/FrancBG/buscaloenchatgpt)
 
-Parodia inspirada en **LMGTFY**: escribes una pregunta, compartes el enlace, se reproduce una animación y al final se intenta **copiar el texto al portapapeles**, se muestra un mensaje y se abre **ChatGPT** para pegar la pregunta. El destino del formulario GET en `/ask` es el origen del chat (variable pública **`PUBLIC_CHATGPT_ORIGIN`**, por defecto `https://chatgpt.com`). Sin backend propio; proyecto **SvelteKit** + Tailwind.
+Parodia inspirada en **LMGTFY**: en la home escribes una pregunta y obtienes un **enlace compartible** (`/ask?q=...`); al abrirlo se reproduce la animación y al final se intenta **copiar el texto al portapapeles**, se muestra un mensaje y se abre **ChatGPT** para pegar la pregunta. El destino del formulario GET en `/ask` es el origen del chat (variable pública **`PUBLIC_CHATGPT_ORIGIN`**, por defecto `https://chatgpt.com`). Sin backend propio; proyecto **SvelteKit** + Tailwind.
 
 ## Desarrollo
 
