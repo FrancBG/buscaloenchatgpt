@@ -1,6 +1,5 @@
 <script lang="ts">
-	import Buttons from '$lib/components/Buttons.svelte'
-	import Search from '$lib/components/Search.svelte'
+	import ChatComposer from '$lib/components/ChatComposer.svelte'
 
 	let f: string
 	export { f as for }
@@ -9,13 +8,16 @@
 	export { className as class }
 
 	export let action: string
+	export let variant: 'generator' | 'receiver' = 'generator'
 	export let submitButton: HTMLButtonElement | undefined = undefined
 	export let input: HTMLInputElement | undefined = undefined
-	export let submitLabel = 'Buscarlo'
 	/** Si es true, el submit no navega (útil en `/ask` para animación sin envío GET real). */
 	export let preventSubmit = false
 	/** Llamado tras preventDefault cuando `preventSubmit` es true; recibe el valor de `q`. */
 	export let onQuerySubmit: ((query: string) => void) | undefined = undefined
+	export let receiverSubmitEnabled = false
+	export let receiverPolished = false
+	export let onReceiverSubmit: (() => void) | undefined = undefined
 
 	function onSubmit(e: SubmitEvent) {
 		if (preventSubmit) {
@@ -30,12 +32,19 @@
 <form
 	{action}
 	autocomplete="off"
-	class="flex flex-col items-center gap-4 px-4 {className}"
+	class="flex w-full flex-col items-center px-4 {className}"
 	method="GET"
 	role="search"
 	on:submit={onSubmit}
 >
 	<slot name="header" />
-	<Search id={f} bind:input />
-	<Buttons bind:submitButton label={submitLabel} />
+	<ChatComposer
+		{variant}
+		id={f}
+		bind:input
+		bind:submitButton
+		{receiverSubmitEnabled}
+		{receiverPolished}
+		{onReceiverSubmit}
+	/>
 </form>

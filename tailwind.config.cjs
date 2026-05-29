@@ -20,6 +20,8 @@ module.exports = {
 					/** Botón primario (relleno oscuro en tema claro) */
 					btn: '#000000',
 					onBtn: '#ffffff',
+					tooltip: '#171717',
+					tooltipAccent: '#e8c547',
 				},
 				memeDark: {
 					surface: '#212121',
@@ -29,6 +31,8 @@ module.exports = {
 					chip: '#2d2d2d',
 					btn: '#fafafa',
 					onBtn: '#171717',
+					tooltip: '#262626',
+					tooltipAccent: '#e8c547',
 				},
 			},
 			fontFamily: {

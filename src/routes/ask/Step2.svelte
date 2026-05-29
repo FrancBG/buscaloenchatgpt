@@ -1,10 +1,9 @@
 <script lang="ts">
-	export let button: HTMLButtonElement
-
 	let className: string | undefined = undefined
 	export { className as class }
 
-	$: submitLabel = button.textContent?.trim() || 'Buscarlo'
+	/** Texto para el copy del paso (el submit en receptor es solo icono). */
+	export let submitLabel = 'el botón de enviar'
 </script>
 
 <div class={className}>

@@ -3,7 +3,10 @@
 	import { base } from '$app/paths'
 	import { page } from '$app/stores'
 	import Form from '$lib/components/Form.svelte'
+	import MemeHero from '$lib/components/MemeHero.svelte'
+	import MemePageShell from '$lib/components/MemePageShell.svelte'
 	import { copyTextToClipboard } from '$lib/copyToClipboard.js'
+	import { ASK_TITLE, CLIPBOARD_FAIL, CLIPBOARD_OK } from '$lib/copy.js'
 	import { CHAT_SUBMIT_ORIGIN } from '$lib/config.js'
 	import { ArrowUpLeft } from '@natoboram/heroicons.svelte/20/solid'
 	import { onMount } from 'svelte'
@@ -11,13 +14,16 @@
 	import Step2 from './Step2.svelte'
 	import Step3 from './Step3.svelte'
 
-	const CLIPBOARD_OK =
-		'Texto copiado en el portapapeles para que sólo lo tengas que pegar. Vamos que esto sabes hacerlo.'
-	const CLIPBOARD_FAIL =
-		'No pudimos copiar al portapapeles (permisos del navegador). Copia tú el texto del campo de arriba; te llevamos a ChatGPT igualmente.'
-
 	const PHASE_PAUSE_MS = 1000
 	const STEP2_PAUSE_MS = 3500
+
+	let animationComplete = false
+	let receiverPolished = false
+	let showCursor = true
+
+	function openChat() {
+		window.location.assign(CHAT_SUBMIT_ORIGIN)
+	}
 
 	onMount(async () => {
 		await new Promise(resolve => requestIdleCallback(resolve))
@@ -41,8 +47,13 @@
 		const copied = await copyTextToClipboard(q)
 		clipboardMessage = copied ? CLIPBOARD_OK : CLIPBOARD_FAIL
 
-		await new Promise(resolve => setTimeout(resolve, 2800))
-		window.location.assign(CHAT_SUBMIT_ORIGIN)
+		animationComplete = true
+
+		// Paso 4 interno: ocultar cursor y fijar estilos finales de la barra
+		step++
+		showCursor = false
+		receiverPolished = true
+		await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
 	})
 
 	async function move(cursor: HTMLDivElement, target: HTMLElement) {
@@ -98,33 +109,41 @@
 <div
 	bind:this={cursor}
 	class="pointer-events-none absolute left-0 top-0 text-meme-ink dark:text-memeDark-ink"
+	class:hidden={!showCursor}
+	aria-hidden="true"
 >
 	<ArrowUpLeft />
 </div>
 
-<div class="flex w-full flex-col items-center gap-4">
+<MemePageShell>
+	<MemeHero slot="hero" title={ASK_TITLE} />
+
 	<Form
-		class="w-full max-w-2xl"
+		class="w-full"
 		action={CHAT_SUBMIT_ORIGIN}
 		preventSubmit={true}
+		variant="receiver"
 		bind:input
 		bind:submitButton={button}
+		receiverSubmitEnabled={animationComplete}
+		receiverPolished={receiverPolished}
+		onReceiverSubmit={openChat}
 		for="ask-input"
 	/>
 
 	{#if step === 0}
 		<Step1
-			class="w-full max-w-2xl rounded-2xl border border-meme-line bg-meme-chip p-5 text-meme-ink dark:border-memeDark-line dark:bg-memeDark-chip dark:text-memeDark-ink"
+			class="w-full rounded-2xl border border-meme-line bg-meme-chip p-5 text-meme-ink dark:border-memeDark-line dark:bg-memeDark-chip dark:text-memeDark-ink"
 		/>
 	{:else if step === 1}
 		<Step2
-			{button}
-			class="w-full max-w-2xl rounded-2xl border border-meme-line bg-meme-chip p-5 text-meme-ink dark:border-memeDark-line dark:bg-memeDark-chip dark:text-memeDark-ink"
+			submitLabel="la flecha de enviar"
+			class="w-full rounded-2xl border border-meme-line bg-meme-chip p-5 text-meme-ink dark:border-memeDark-line dark:bg-memeDark-chip dark:text-memeDark-ink"
 		/>
 	{:else if step === 2}
 		<Step3
 			{clipboardMessage}
-			class="w-full max-w-2xl rounded-2xl border border-meme-line bg-meme-chip/80 p-5 text-meme-ink dark:border-memeDark-line dark:bg-memeDark-chip/80 dark:text-memeDark-ink"
+			class="w-full rounded-2xl border border-meme-line bg-meme-chip/80 p-5 text-meme-ink dark:border-memeDark-line dark:bg-memeDark-chip/80 dark:text-memeDark-ink"
 		/>
 	{/if}
-</div>
+</MemePageShell>
